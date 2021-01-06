@@ -548,6 +548,9 @@ set (SOURCES ${SOURCES}
    ${PROJECT_SOURCE_DIR}/src/mongoc/mongoc-stream-gridfs-download.c
    ${PROJECT_SOURCE_DIR}/src/mongoc/mongoc-stream-gridfs-upload.c
    ${PROJECT_SOURCE_DIR}/src/mongoc/mongoc-stream-socket.c
+   ${PROJECT_SOURCE_DIR}/src/mongoc/mongoc-structured-log.c
+   ${PROJECT_SOURCE_DIR}/src/mongoc/mongoc-structured-log-command.c
+   ${PROJECT_SOURCE_DIR}/src/mongoc/mongoc-structured-log-connection.c
    ${PROJECT_SOURCE_DIR}/src/mongoc/mongoc-topology.c
    ${PROJECT_SOURCE_DIR}/src/mongoc/mongoc-topology-background-monitoring.c
    ${PROJECT_SOURCE_DIR}/src/mongoc/mongoc-topology-description.c
@@ -607,6 +610,7 @@ set (HEADERS
    ${PROJECT_SOURCE_DIR}/src/mongoc/mongoc-stream-file.h
    ${PROJECT_SOURCE_DIR}/src/mongoc/mongoc-stream-gridfs.h
    ${PROJECT_SOURCE_DIR}/src/mongoc/mongoc-stream-socket.h
+   ${PROJECT_SOURCE_DIR}/src/mongoc/mongoc-structured-log.h
    ${PROJECT_SOURCE_DIR}/src/mongoc/mongoc-topology-description.h
    ${PROJECT_SOURCE_DIR}/src/mongoc/mongoc-uri.h
    ${PROJECT_SOURCE_DIR}/src/mongoc/mongoc-version-functions.h
@@ -978,6 +982,7 @@ set (test-libmongoc-sources
    ${PROJECT_SOURCE_DIR}/tests/test-mongoc-speculative-auth.c
    ${PROJECT_SOURCE_DIR}/tests/test-mongoc-stream.c
    ${PROJECT_SOURCE_DIR}/tests/test-mongoc-streamable-ismaster.c
+   ${PROJECT_SOURCE_DIR}/tests/test-mongoc-structured-log.c
    ${PROJECT_SOURCE_DIR}/tests/test-mongoc-thread.c
    ${PROJECT_SOURCE_DIR}/tests/test-mongoc-topology-description.c
    ${PROJECT_SOURCE_DIR}/tests/test-mongoc-topology-reconcile.c

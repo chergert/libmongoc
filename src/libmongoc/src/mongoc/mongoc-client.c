@@ -61,6 +61,8 @@
 #include "mongoc-change-stream-private.h"
 #include "mongoc-client-session-private.h"
 #include "mongoc-cursor-private.h"
+#include "mongoc-structured-log-command-private.h"
+#include "mongoc-structured-log-connection-private.h"
 
 #ifdef MONGOC_ENABLE_SSL
 #include "mongoc-stream-tls.h"
@@ -1170,6 +1172,8 @@ _mongoc_client_new_from_uri (mongoc_topology_t *topology)
       _mongoc_client_set_internal_tls_opts (client, &internal_tls_opts);
    }
 #endif
+
+   mongoc_structured_log_connection_client_created ();
 
    mongoc_counter_clients_active_inc ();
 
@@ -2323,12 +2327,24 @@ _mongoc_client_monitor_op_killcursors (mongoc_cluster_t *cluster,
 
    client = cluster->client;
 
+   bson_init (&doc);
+   _mongoc_client_prepare_killcursors_command (cursor_id, collection, &doc);
+
+   /* @todo Provide missing arguments */
+   mongoc_structured_log_command_started (&doc,
+                                          "killCursors",
+                                          db,
+                                          operation_id,
+                                          cluster->request_id,
+                                          &server_stream->sd->host,
+                                          0,
+                                          false);
+
    if (!client->apm_callbacks.started) {
+      bson_destroy (&doc);
       return;
    }
 
-   bson_init (&doc);
-   _mongoc_client_prepare_killcursors_command (cursor_id, collection, &doc);
    mongoc_apm_command_started_init (&event,
                                     &doc,
                                     db,
@@ -2364,16 +2380,27 @@ _mongoc_client_monitor_op_killcursors_succeeded (
 
    client = cluster->client;
 
-   if (!client->apm_callbacks.succeeded) {
-      EXIT;
-   }
-
    /* fake server reply to killCursors command: {ok: 1, cursorsUnknown: [42]} */
    bson_init (&doc);
    bson_append_int32 (&doc, "ok", 2, 1);
    bson_append_array_begin (&doc, "cursorsUnknown", 14, &cursors_unknown);
    bson_append_int64 (&cursors_unknown, "0", 1, cursor_id);
    bson_append_array_end (&doc, &cursors_unknown);
+
+   /* @todo Provide missing arguments */
+   mongoc_structured_log_command_success ("killCursors",
+                                          operation_id,
+                                          &doc,
+                                          duration,
+                                          cluster->request_id,
+                                          &server_stream->sd->host,
+                                          0,
+                                          false);
+
+   if (!client->apm_callbacks.succeeded) {
+      bson_destroy (&doc);
+      EXIT;
+   }
 
    mongoc_apm_command_succeeded_init (&event,
                                       duration,
@@ -2408,13 +2435,24 @@ _mongoc_client_monitor_op_killcursors_failed (
 
    client = cluster->client;
 
-   if (!client->apm_callbacks.failed) {
-      EXIT;
-   }
-
    /* fake server reply to killCursors command: {ok: 0} */
    bson_init (&doc);
    bson_append_int32 (&doc, "ok", 2, 0);
+
+   /* @todo Provide missing arguments */
+   mongoc_structured_log_command_failure ("killCursors",
+                                          operation_id,
+                                          &doc,
+                                          error,
+                                          cluster->request_id,
+                                          &server_stream->sd->host,
+                                          0,
+                                          false);
+
+   if (!client->apm_callbacks.failed) {
+      bson_destroy (&doc);
+      EXIT;
+   }
 
    mongoc_apm_command_failed_init (&event,
                                    duration,
