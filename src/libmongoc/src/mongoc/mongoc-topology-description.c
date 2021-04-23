@@ -103,7 +103,7 @@ mongoc_topology_description_init (mongoc_topology_description_t *description,
  *
  *       Deep-copy @src to an uninitialized topology description @dst.
  *       @dst must not already point to any allocated resources. Clean
- *       up with mongoc_topology_description_destroy.
+ *       up with mongoc_topology_description_cleanup.
  *
  *       WARNING: @dst's rand_seed is not initialized.
  *
@@ -165,9 +165,9 @@ _mongoc_topology_description_copy_to (const mongoc_topology_description_t *src,
 /*
  *--------------------------------------------------------------------------
  *
- * mongoc_topology_description_destroy --
+ * mongoc_topology_description_cleanup --
  *
- *       Destroy allocated resources within @description
+ *       Destroy allocated resources within @description but don't free it.
  *
  * Returns:
  *       None.
@@ -178,7 +178,7 @@ _mongoc_topology_description_copy_to (const mongoc_topology_description_t *src,
  *--------------------------------------------------------------------------
  */
 void
-mongoc_topology_description_destroy (mongoc_topology_description_t *description)
+mongoc_topology_description_cleanup (mongoc_topology_description_t *description)
 {
    ENTRY;
 
@@ -1957,7 +1957,7 @@ mongoc_topology_description_handle_ismaster (
              &sd->topology_version, &incoming_topology_version) == 1) {
          TRACE ("%s", "topology version is strictly less. Skipping.");
          if (prev_td) {
-            mongoc_topology_description_destroy (prev_td);
+            mongoc_topology_description_cleanup (prev_td);
             bson_free (prev_td);
          }
          return;
@@ -2045,7 +2045,7 @@ mongoc_topology_description_handle_ismaster (
    }
 
    if (prev_td) {
-      mongoc_topology_description_destroy (prev_td);
+      mongoc_topology_description_cleanup (prev_td);
       bson_free (prev_td);
    }
 
