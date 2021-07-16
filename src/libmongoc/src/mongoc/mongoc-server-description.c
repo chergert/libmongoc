@@ -122,6 +122,7 @@ mongoc_server_description_init (mongoc_server_description_t *sd,
    sd->id = id;
    sd->type = MONGOC_SERVER_UNKNOWN;
    sd->round_trip_time_msec = MONGOC_RTT_UNSET;
+   sd->generation = 0;
 
    if (!_mongoc_host_list_from_string (&sd->host, address)) {
       MONGOC_WARNING ("Failed to parse uri for %s", address);
@@ -805,6 +806,9 @@ mongoc_server_description_new_copy (
                                               &description->error);
    } else {
       mongoc_server_description_reset (copy);
+      /* preserve the original server description type, which is manually set
+       * for a LoadBalancer server */
+      copy->type = description->type;
    }
 
    /* Preserve the error */
