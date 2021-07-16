@@ -242,4 +242,7 @@ test_framework_skip_if_no_aws (void);
 int
 test_framework_skip_if_no_setenv (void);
 
+bool
+test_framework_is_serverless (void);
+
 #endif
