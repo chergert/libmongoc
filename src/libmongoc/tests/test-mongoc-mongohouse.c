@@ -152,6 +152,7 @@ cmd_succeeded_cb (const mongoc_apm_command_succeeded_t *event)
    /* Store cursor information from our initial find. */
    if (strcmp (cmd, "find") == 0) {
       const char *temp;
+      int temp_size = 0;
 
       BSON_ASSERT (!test->parsed_cursor);
 
@@ -165,8 +166,9 @@ cmd_succeeded_cb (const mongoc_apm_command_succeeded_t *event)
       BSON_ASSERT (BSON_ITER_HOLDS_UTF8 (&child_iter));
 
       temp = bson_iter_utf8 (&child_iter, NULL);
-      test->cursor_ns = (char *) bson_malloc0 (strlen (temp));
-      strncpy (test->cursor_ns, temp, strlen (temp));
+      temp_size = 1 + strlen(temp);
+      test->cursor_ns = (char *) bson_malloc0 (temp_size);
+      memcpy (test->cursor_ns, temp, temp_size);
 
       test->parsed_cursor = true;
 
